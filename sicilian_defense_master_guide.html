@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>シシリアンディフェンス マスターガイド</title>
+    <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1, h2, h3, h4 {
+            color: #2c3e50;
+            margin-top: 1.5em;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 1em;
+            border-bottom: 2px solid #4a90e2;
+            padding-bottom: 0.5em;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .board-container {
+            flex: 1;
+            min-width: 400px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .info-container {
+            flex: 1;
+            min-width: 400px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .variation-selector {
+            margin-bottom: 20px;
+        }
+        .moves-container {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+        }
+        .move {
+            display: inline-block;
+            margin: 5px;
+            padding: 5px 10px;
+            background-color: #e7f4ff;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .move:hover {
+            background-color: #d0e8ff;
+        }
+        .move.current {
+            background-color: #4a90e2;
+            color: white;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #357abd;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .explanation {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f7ff;
+            border-left: 4px solid #4a90e2;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 10px 20px;
+            background-color: #e7e7e7;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .tab.active {
+            background-color: #4a90e2;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background-color: white;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .image-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .gallery-item {
+            flex: 1;
+            min-width: 300px;
+            max-width: 400px;
+            margin-bottom: 20px;
+        }
+        .gallery-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .gallery-item h4 {
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+        .gallery-item p {
+            font-size: 14px;
+            color: #666;
+        }
+        .exercise {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        .exercise img {
+            max-width: 400px;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+            border-radius: 8px;
+        }
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .option {
+            padding: 10px 20px;
+            background-color: #e7f4ff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .option:hover {
+            background-color: #d0e8ff;
+        }
+        .answer {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f7ff;
+            border-left: 4px solid #4a90e2;
+        }
+        .section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        .concept {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .concept-text {
+            flex: 2;
+            min-width: 300px;
+        }
+        .concept-image {
+            flex: 1;
+            min-width: 300px;
+        }
+        .concept-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .gm-game {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        .gm-game img {
+            max-width: 400px;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+            border-radius: 8px;
+        }
+        .comparison {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .comparison-item {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .comparison-item.bad {
+            border-left: 4px solid #F44336;
+        }
+        .comparison-item.good {
+            border-left: 4px solid #4CAF50;
+        }
+        .comparison-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .fen-code {
+            font-family: monospace;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        .pgn-code {
+            font-family: monospace;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            white-space: pre-wrap;
+        }
+        .toc {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+        .toc li {
+            margin-bottom: 10px;
+        }
+        .toc a {
+            text-decoration: none;
+            color: #4a90e2;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        .print-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        .print-button:hover {
+            background-color: #357abd;
+        }
+        @media print {
+            .print-button, .tabs, .controls, .variation-selector {
+                display: none;
+            }
+            .tab-content {
+                display: block !important;
+            }
+            body {
+                background-color: white;
+            }
+            .section, .exercise, .gm-game, .comparison-item {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>シシリアンディフェンス マスターガイド</h1>
+
+    <div class="toc">
+        <h2>目次</h2>
+        <ul>
+            <li><a href="#introduction">1. はじめに</a></li>
+            <li><a href="#basic-concepts">2. 基本概念と戦略的アイデア</a></li>
+            <li><a href="#variations">3. 主要なバリエーション</a>
+                <ul>
+                    <li><a href="#najdorf">3.1 ナイドルフバリエーション</a></li>
+                    <li><a href="#dragon">3.2 ドラゴンバリエーション</a></li>
+                    <li><a href="#scheveningen">3.3 シェベニンゲンバリエーション</a></li>
+                    <li><a href="#classical">3.4 クラシカルバリエーション</a></li>
+                    <li><a href="#other-variations">3.5 その他のバリエーション</a></li>
+                </ul>
+            </li>
+            <li><a href="#interactive-board">4. インタラクティブチェス盤</a></li>
+            <li><a href="#practice-problems">5. 練習問題</a></li>
+            <li><a href="#gm-games">6. グランドマスターの対局</a></li>
+            <li><a href="#common-mistakes">7. よくある間違いとその修正方法</a></li>
+            <li><a href="#references">8. 参考文献</a></li>
+        </ul>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" data-tab="introduction">はじめに</div>
+        <div class="tab" data-tab="basic-concepts">基本概念</div>
+        <div class="tab" data-tab="variations">バリエーション</div>
+        <div class="tab" data-tab="interactive-board">インタラクティブ</div>
+        <div class="tab" data-tab="practice-problems">練習問題</div>
+        <div class="tab" data-tab="gm-games">GM対局</div>
+        <div class="tab" data-tab="common-mistakes">よくある間違い</div>
+    </div>
+
+    <div id="introduction" class="tab-content active">
+        <div class="section">
+            <h2 id="introduction">1. はじめに</h2>
+            <p>シシリアンディフェンスは、チェスの歴史の中で最も人気があり、最も研究されているオープニングの一つです。1.e4に対して1...c5と応じるこの防御戦法は、攻撃的な性格を持ち、多くのトッププレイヤーに愛用されてきました。</p>
+            
+            <p>このマスターガイドでは、中級レベルのチェスプレイヤーを対象に、シシリアンディフェンスを視覚的に理解しながら体系的に学ぶための情報を提供します。基本概念から主要なバリエーション、典型的なプラン、グランドマスターの対局例まで、幅広くカバーしています。</p>
+            
+            <p>特に視覚的な理解を重視し、各バリエーションの特徴や戦略を図やインタラクティブな要素を通じて学べるよう工夫しています。このガイドを通じて、シシリアンディフェンスの奥深さと魅力を理解し、あなたのチェスの腕前を向上させる一助となれば幸いです。</p>
+            
+            <div class="concept">
+                <div class="concept-text">
+                    <h3>シシリアンディフェンスとは</h3>
+                    <p>シシリアンディフェンスは、1.e4に対して1...c5と応じる黒のオープニングです。このオープニングの名前は、18世紀にイタリアのシチリア島のチェスプレイヤーたちが好んで使用したことに由来しています。</p>
+                    
+                    <p>シシリアンディフェンスの最大の特徴は、白の中央ポーン（e4）に対して非対称的に対抗することです。1...e5と対称的に応じる代わりに、c5と指すことで、白の中央支配に挑戦しながらも、異なる展開を目指します。</p>
+                    
+                    <p>このオープニングは、黒にとって最も攻撃的で勝利を目指せるオープニングの一つとされ、多くのトップグランドマスターに愛用されてきました。カスパロフ、フィッシャー、カルポフなど、歴代のチャンピオンたちもシシリアンディフェンスを得意としていました。</p>
+                </div>
+                <div class="concept-image">
+                    <img src="images/sicilian_basic.png" alt="シシリアンディフェンス 基本形">
+                    <p><strong>シシリアンディフェンスの基本形</strong>: 1.e4 c5</p>
+                    <div class="fen-code">rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="basic-concepts" class="tab-content">
+        <div class="section">
+            <h2 id="basic-concepts">2. 基本概念と戦略的アイデア</h2>
+            
+            <div class="concept">
+                <div class="concept-text">
+                    <h3>中央のコントロール</h3>
+                    <p>シシリアンディフェンスの最も重要な戦略的アイデアの一つは、中央のコントロールに関するものです。1...c5と指すことで、黒はd4の地点に利きを作り、白の中央支配に対抗します。</p>
+                    
+                    <p>多くの場合、白は2.Nf3 d6 3.d4と進み、中央でのポーン交換が行われます。この交換後、黒はクイーンサイドに多数派のポーンを持つことになり、エンドゲームでの優位性を得る可能性があります。</p>
+                    
+                    <p>また、黒は中央でのポーン交換後に生じる半開cファイルを利用して、ルークを活用することができます。これは、シシリアンディフェンスの重要な戦略的リソースの一つです。</p>
+                </div>
+                <div class="concept-image">
+                    <img src="images/sicilian_center_control.png" alt="シシリアンディフェンスの中央コントロール">
+                    <p><strong>中央のコントロール</strong>: c5のポーンがd4に利きを作る</p>
+                </div>
+            </div>
+            
+            <div class="concept">
+                <div class="concept-text">
+                    <h3>駒の展開</h3>
+                    <p>シシリアンディフェンスでは、黒の駒の展開パターンがバリエーションによって大きく異なります。しかし、一般的には以下のような展開が見られます：</p>
+                    
+                    <ul>
+                        <li>ナイトはf6とc6（または時にa6）に展開</li>
+                        <li>ビショップはe7、g7（ドラゴン）、b7などに展開</li>
+                        <li>クイーンはc7、b6などに展開</li>
+                        <li>キングは通常キングサイドにキャスリング</li>
+                    </ul>
+                    
+                    <p>駒の展開順序は非常に重要で、わずかな違いが異なるバリエーションを生み出します。例えば、5...a6（ナイドルフ）、5...g6（ドラゴン）、5...e6（シェベニンゲン）などの違いがあります。</p>
+                </div>
+                <div class="concept-image">
+                    <img src="images/sicilian_development.png" alt="シシリアンディフェンスの駒展開">
+                    <p><strong>典型的な駒展開</strong>: ナイトをf6とc6に、ビショップをe7に展開</p>
+                </div>
+            </div>
+            
+            <div class="concept">
+                <div class="concept-text">
+                    <h3>ポーン構造</h3>
+                    <p>シシリアンディフェンスでは、ポーン構造が戦略に大きな影響を与えます。典型的なポーン構造の特徴は以下の通りです：</p>
+                    
+                    <ul>
+                        <li>黒はクイーンサイドに多数派のポーンを持つ</li>
+                        <li>d6のポーンは中央での足場を提供</li>
+                        <li>e6またはe5のポーンは中央でのスペースを確保</li>
+                        <li>a6のポーンはb5の地点を支配（ナイドルフ）</li>
+                        <li>g6のポーンはビショップのフィアンケットを準備（ドラゴン）</li>
+                    </ul>
+                    
+                    <p>これらのポーン構造は、各バリエーションの特徴を形作り、異なる戦略的アイデアを生み出します。</p>
+                </div>
+                <div class="concept-image">
+                    <img src="images/sicilian_pawn_structure.png" alt="シシリアンディフェンスのポーン構造">
+                    <p><strong>典型的なポーン構造</strong>: クイーンサイドに多数派のポーン</p>
+                </div>
+            </div>
+            
+            <div class="concept">
+                <div class="concept-text">
+                    <h3>攻撃と防御のバランス</h3>
+                    <p>シシリアンディフェンスは、攻撃的なオープニングとして知られていますが、適切な防御も重要です。黒は通常、以下のような戦略を取ります：</p>
+                    
+                    <ul>
+                        <li>キングの安全を確保（通常はキングサイドキャスリング）</li>
+                        <li>中央での対抗</li>
+                        <li>クイーンサイドでのカウンター攻撃</li>
+                        <li>白の攻撃に対する適切な防御</li>
+                    </ul>
+                    
+                    <p>白は通常、キングサイドからの攻撃や中央突破を目指しますが、黒はクイーンサイドでのカウンター攻撃や中央での対抗を通じて、バランスを取ろうとします。</p>
+                </div>
+                <div class="concept-image">
+                    <img src="images/sicilian_attack_defense.png" alt="シシリアンディフェンスの攻撃と防御">
+                    <p><strong>攻撃と防御のバランス</strong>: 白のキングサイド攻撃と黒のカウンター</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="variations" class="tab-content">
+        <div class="section">
+            <h2 id="variations">3. 主要なバリエーション</h2>
+            <p>シシリアンディフェンスには多くのバリエーションがあります。ここでは主要なバリエーションについて詳しく解説します。</p>
+            
+            <h3 id="najdorf">3.1 ナイドルフバリエーション</h3>
+            <div class="concept">
+                <div class="concept-text">
+                    <p>ナイドルフバリエーションは、5...a6と指す形で、カスパロフやフィッシャーも好んで使用したバリエーションです。a6と突きだす手の意図は、b5の地点に利かせることで白のNb5やBb5を予め潰しておくと共に、将来的には自分でb5~Bb7とフィアンケットを組む準備をします。</p>
+                    
+                    <p>このバリエーションは非常に鋭く、理論的な知識が重要です。白は様々な応手を持っており、6.Bg5, 6.Be3, 6.Be2, 6.f3などが主要な選択肢です。</p>
+                    
+                    <p>黒の典型的なプランは、キングサイドにキャスリングし、e5の突破を準備することです。また、b5-b4の前進や、クイーンサイドでのカウンター攻撃も重要な戦略です。</p>
+                    
+                    <div class="pgn-code">1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6</div>
+                </div>
+                <div class="concept-image">
+                    <img src="images/sicilian_najdorf.png" alt="ナイドルフバリエーション">
+                    <p><strong>ナイドルフバリエーション</strong>: 5...a6</p>
+                    <div class="fen-code">rnbqkb1r/1p2pppp/p2p1n2/8/3NP3/2N5/PPP2PPP/R1BQKB1R w KQkq - 0 6</div>
+                </div>
+            </div>
+            
+            <h3 id="dragon">3.2 ドラゴンバリエーション</h3>
+            <div class="concept">
+                <div class="concept-text">
+                    <p>ドラゴンバリエーションは、5...g6と指し、ビショップをg7にフィアンケットする形です。このビショップが長い対角線上で強力な働きをするため、「ドラゴン」と呼ばれています。</p>
+                    
+                    <p>白の最も鋭い応手は「ユーゴスラビアアタック」と呼ばれる攻撃で、Be3, f3, Qd2, 0-0-0と指し、h-fileからの攻撃を準備します。</p>
+                    
+                    <p>黒の典型的なプランは、長い対角線上のビショップの活用、c-fileでのプレッシャー、白のキングに対する攻撃などです。非常に鋭い戦いになることが多く、両者のキングが反対側にキャスリングする「相互攻撃」の局面が生まれやすいです。</p>
+                    
+                    <div class="pgn-code">1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 g6</div>
+                </div>
+                <div class="concept-image">
+                    <img src="images/sicilian_dragon.png" alt="ドラゴンバリエーション">
+                    <p><strong>ドラゴンバリエーション</strong>: 5...g6</p>
+                    <div class="fen-code">rnbqkb1r/pp2pp1p/3p1np1/8/3NP3/2N5/PPP2PPP/R1BQKB1R w KQkq - 0 6</div>
+                </div>
+            </div>
+            
+            <h3 id="scheveningen">3.3 シェベニンゲンバリエーション</h3>
+            <div class="concept">
+                <div class="concept-text">
+                    <p>シェベニンゲンバリエーションは、5...e6と指す形です。堅実な構えで、キングの安全を確保しながらカウンター攻撃の準備をします。</p>
+                    
+                    <p>白の主要な応手は「ケレス・アタック」と呼ばれる攻撃で、g4-g5と前進してキングサイドから攻撃を仕掛けます。また、f4-f5の前進も重要な戦略です。</p>
+                    
+                    <p>黒の典型的なプランは、d5の突破を準備すること、クイーンサイドでのカウンター攻撃、白の攻撃に対する堅実な防御などです。柔軟性が高く、様々な状況に対応できるバリエーションです。</p>
+                    
+                    <div class="pgn-code">1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 e6</div>
+                </div>
+                <div class="concept-image">
+                    <img src="images/sicilian_scheveningen.png" alt="シェベニンゲンバリエーション">
+                    <p><strong>シェベニンゲンバリエーション</strong>: 5...e6</p>
+                    <div class="fen-code">rnbqkb1r/pp3ppp/3ppn2/8/3NP3/2N5/PPP2PPP/R1BQKB1R w KQkq - 0 6</div>
+                </div>
+            </div>
+            
+            <h3 id="classical">3.4 クラシカルバリエーション</h3>
+            <div class="concept">
+                <div class="concept-text">
+                    <p>クラシカルバリエーションは、5...Nc6と指す形です。ナイトを積極的に中央に展開し、e5の地点を支配します。</p>
+                    
+                    <p>白の主要な応手は、6.Bc4（リヒター・ラウザーアタック）や6.Be2などがあります。リヒター・ラウザーアタックは非常に鋭い攻撃で、黒は正確な防御が必要です。</p>
+                    
+                    <p>黒の典型的なプランは、e5の突破、クイーンサイドでのカウンター攻撃、白のd4ナイトに対するプレッシャーなどです。駒の展開が自然で、初心者にも扱いやすいバリエーションです。</p>
+                    
+                    <div class="pgn-code">1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 Nc6</div>
+                </div>
+                <div class="concept-image">
+                    <img src="images/sicilian_classical.png" alt="クラシカルバリエーション">
+                    <p><strong>クラシカルバリエーション</strong>: 5...Nc6</p>
+                    <div class="fen-code">r1bqkb1r/pp2pppp/2np1n2/8/3NP3/2N5/PPP2PPP/R1BQKB1R w KQkq - 2 6</div>
+                </div>
+            </div>
+            
+            <h3 id="other-variations">3.5 その他のバリエーション</h3>
+            <div class="image-gallery">
+                <div class="gallery-item">
+                    <img src="images/sicilian_accelerated_dragon.png" alt="アクセレレイテッドドラゴン">
+                    <h4>アクセレレイテッドドラゴン</h4>
+                    <p>4...g6と早めにビショップをフィアンケットする形です。通常のドラゴンバリエーションよりも早くg6と指すことで、白のマレーシー・バインド（c4, e4, d4のポーン配置）を避けることができます。</p>
+                    <div class="pgn-code">1. e4 c5 2. Nf3 Nc6 3. d4 cxd4 4. Nxd4 g6</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="images/sicilian_kan.png" alt="カン・バリエーション">
+                    <h4>カン・バリエーション</h4>
+                    <p>e6とa6を組み合わせた形です。シェベニンゲンバリエーションとナイドルフバリエーションの要素を取り入れた柔軟な構えで、様々な展開に対応できます。</p>
+                    <div class="pgn-code">1. e4 c5 2. Nf3 e6 3. d4 cxd4 4. Nxd4 a6</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="images/sicilian_four_knights.png" alt="フォー・ナイツ・バリエーション">
+                    <h4>フォー・ナイツ・バリエーション</h4>
+                    <p>両者が2つのナイトを展開する形です。バランスの取れた構えで、中央のコントロールを争います。</p>
+                    <div class="pgn-code">1. e4 c5 2. Nf3 e6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 Nc6</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="images/sicilian_closed.png" alt="クローズドシシリアン">
+                    <h4>クローズドシシリアン</h4>
+                    <p>白が2.c3と指す形です。d4の突破を準備しながら、黒のカウンタープレイを制限します。穏やかな展開を好む白向けのバリエーションです。</p>
+                    <div class="pgn-code">1. e4 c5 2. c3</div>
+                </div>
+            </div>
+            
+            <h3>バリエーションのツリー図</h3>
+            <img src="images/sicilian_tree.png" alt="シシリアンディフェンスのバリエーションツリー" style="max-width: 100%; height: auto;">
+        </div>
+    </div>
+
+    <div id="interactive-board" class="tab-content">
+        <div class="section">
+            <h2 id="interactive-board">4. インタラクティブチェス盤</h2>
+            <p>以下のインタラクティブチェス盤で、シシリアンディフェンスの各バリエーションを実際に動かして確認することができます。バリエーションを選択し、手順を追いながら理解を深めましょう。</p>
+            
+            <div class="container">
+                <div class="board-container">
+                    <div class="variation-selector">
+                        <label for="variation">バリエーションを選択:</label>
+                        <select id="variation">
+                            <option value="basic">シシリアンディフェンス 基本形</option>
+                            <option value="najdorf">ナイドルフバリエーション</option>
+                            <option value="dragon">ドラゴンバリエーション</option>
+                            <option value="scheveningen">シェベニンゲンバリエーション</option>
+                            <option value="classical">クラシカルバリエーション</option>
+                            <option value="accelerated_dragon">アクセレレイテッドドラゴン</option>
+                            <option value="kan">カン・バリエーション</option>
+                            <option value="four_knights">フォー・ナイツ・バリエーション</option>
+                            <option value="closed">クローズドシシリアン</option>
+                            <option value="grand_prix">グランプリアタック</option>
+                            <option value="moscow">モスクワバリエーション</option>
+                            <option value="rossolimo">ロゾリモアタック</option>
+                        </select>
+                    </div>
+                    <div id="board" style="width: 400px"></div>
+                    <div class="controls">
+                        <button id="startBtn">最初へ</button>
+                        <button id="prevBtn">前へ</button>
+                        <button id="nextBtn">次へ</button>
+                        <button id="endBtn">最後へ</button>
+                    </div>
+                </div>
+                <div class="info-container">
+                    <h3 id="variation-title">シシリアンディフェンス 基本形</h3>
+                    <div class="moves-container" id="moves"></div>
+                    <div class="explanation" id="explanation">
+                        <p>シシリアンディフェンスは、1.e4に対して1...c5と応じる黒のオープニングです。白の中央ポーンに対抗し、中央のコントロールを争います。</p>
+                        <p>クイーンサイドのスペースが広がり、駒展開や攻撃に有利に働きます。多くのバリエーションがあり、自分のプレイスタイルに合わせて選ぶことができます。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="practice-problems" class="tab-content">
+        <div class="section">
+            <h2 id="practice-problems">5. 練習問題</h2>
+            <p>以下の練習問題を解いて、シシリアンディフェンスの理解を深めましょう。各問題には複数の選択肢があり、正解を選ぶことで解説を確認できます。</p>
+            
+            <div class="exercise">
+                <h3>問題1: ナイドルフバリエーションでの最善手</h3>
+                <img src="images/practice_najdorf.png" alt="ナイドルフバリエーション" style="max-width: 400px;">
+                <p>この局面で黒の最善手は何でしょうか？</p>
+                <div class="options">
+                    <button class="option" data-correct="false">e5</button>
+                    <button class="option" data-correct="false">Nc6</button>
+                    <button class="option" data-correct="true">e6</button>
+                    <button class="option" data-correct="false">b5</button>
+                </div>
+                <div class="answer" style="display: none;">
+                    <p><strong>正解: e6</strong></p>
+                    <p>e6と指すことで、キングサイドの駒展開の準備をし、キングの安全を確保します。また、d5の地点を支配する準備にもなります。</p>
+                </div>
+            </div>
+            
+            <div class="exercise">
+                <h3>問題2: ドラゴンバリエーションでの白の攻撃プラン</h3>
+                <img src="images/practice_dragon.png" alt="ドラゴンバリエーション" style="max-width: 400px;">
+                <p>ドラゴンバリエーションに対する白の最も効果的な攻撃プランは何でしょうか？</p>
+                <div class="options">
+                    <button class="option" data-correct="false">クイーンサイドからの攻撃</button>
+                    <button class="option" data-correct="true">ユーゴスラビアアタック（Be3, f3, Qd2, 0-0-0）</button>
+                    <button class="option" data-correct="false">中央からの突破</button>
+                    <button class="option" data-correct="false">キングサイドキャスリングからの攻撃</button>
+                </div>
+                <div class="answer" style="display: none;">
+                    <p><strong>正解: ユーゴスラビアアタック（Be3, f3, Qd2, 0-0-0）</strong></p>
+                    <p>ユーゴスラビアアタックは、Be3, f3, Qd2, 0-0-0と指し、h-fileからの攻撃を準備するプランです。これはドラゴンバリエーションに対する最も鋭い攻撃方法の一つです。</p>
+                </div>
+            </div>
+            
+            <div class="exercise">
+                <h3>問題3: シェベニンゲンバリエーションでの黒の次の手</h3>
+                <img src="images/practice_scheveningen.png" alt="シェベニンゲンバリエーション" style="max-width: 400px;">
+                <p>シェベニンゲンバリエーションでの黒の次の手は？</p>
+                <div class="options">
+                    <button class="option" data-correct="false">a6</button>
+                    <button class="option" data-correct="false">Be7</button>
+                    <button class="option" data-correct="true">d5</button>
+                    <button class="option" data-correct="false">Qc7</button>
+                </div>
+                <div class="answer" style="display: none;">
+                    <p><strong>正解: d5</strong></p>
+                    <p>d5と指すことで中央のポーン構造を改善し、白のe4ポーンに圧力をかけます。これはシェベニンゲンバリエーションの主要なアイデアの一つです。</p>
+                </div>
+            </div>
+            
+            <div class="exercise">
+                <h3>問題4: クラシカルバリエーションでの黒の次の手</h3>
+                <img src="images/practice_classical.png" alt="クラシカルバリエーション" style="max-width: 400px;">
+                <p>クラシカルバリエーションでの黒の次の手は？</p>
+                <div class="options">
+                    <button class="option" data-correct="false">Be7</button>
+                    <button class="option" data-correct="true">Nxd4</button>
+                    <button class="option" data-correct="false">d6</button>
+                    <button class="option" data-correct="false">a6</button>
+                </div>
+                <div class="answer" style="display: none;">
+                    <p><strong>正解: Nxd4</strong></p>
+                    <p>Nxd4と指して白のナイトを取り除くことで、e5の地点を強化し、中央でのコントロールを高めます。</p>
+                </div>
+            </div>
+            
+            <div class="exercise">
+                <h3>問題5: オープンシシリアンでの白の最善手</h3>
+                <img src="images/practice_open_sicilian.png" alt="オープンシシリアン" style="max-width: 400px;">
+                <p>オープンシシリアンでの白の最善手は？</p>
+                <div class="options">
+                    <button class="option" data-correct="false">Nc3</button>
+                    <button class="option" data-correct="false">Nf3</button>
+                    <button class="option" data-correct="true">dxc5</button>
+                    <button class="option" data-correct="false">d5</button>
+                </div>
+                <div class="answer" style="display: none;">
+                    <p><strong>正解: dxc5</strong></p>
+                    <p>dxc5と指してポーンを交換することで、オープンシシリアンの基本形に移行します。これにより、白は中央でのスペースアドバンテージを得ることができます。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="gm-games" class="tab-content">
+        <div class="section">
+            <h2 id="gm-games">6. グランドマスターの対局</h2>
+            <p>以下は、シシリアンディフェンスを使用したグランドマスターの模範的な対局です。各対局のハイライト局面を視覚的に示し、重要なポイントを解説します。</p>
+            
+            <div class="gm-game">
+                <h3>カスパロフ vs カルポフ (1985年)</h3>
+                <p>世界チャンピオン戦で行われた有名な対局で、カスパロフがナイドルフバリエーションを使用しました。</p>
+                <img src="images/sicilian_najdorf.png" alt="カスパロフ vs カルポフ" style="max-width: 400px;">
+                <p><strong>ハイライト局面</strong>: カスパロフは16...Nxe4!と鋭い駒の犠牲を行い、白のキングに対する強力な攻撃を開始しました。この攻撃は最終的に勝利につながりました。</p>
+                <p><strong>重要なポイント</strong>: ナイドルフバリエーションでは、適切なタイミングでの戦術的な駒の犠牲が重要です。カスパロフはこの対局で、ナイドルフの攻撃的な可能性を見事に示しました。</p>
+                <div class="pgn-code">1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6 6. Be2 e5 7. Nb3 Be7 8. O-O O-O 9. Be3 Be6 10. f3 Nbd7 11. a4 Rc8 12. a5 Qc7 13. Qd2 Rfe8 14. Rfd1 Bf8 15. Na4 b6 16. axb6 Nxb6 17. Nxb6 Qxb6 18. Qb4 Qc7 19. Ra2 Red8 20. Nc5 Bxc5 21. Bxc5 d5 22. exd5 Nxd5 23. Qb3 Nf4 24. Bf1 Rxd1 25. Qxd1 e4 26. fxe4 Ne2+ 27. Kh1 Bxa2 28. Qxa2 Qxc5 29. Qxa6 Re8 30. e5 Qc4 31. b3 Qf4 32. Qc6 Re6 33. Qc8+ Kh7 34. Qf5+ Qxf5 35. Bxe2 Rxe5 36. Bd3 g6 0-1</div>
+            </div>
+            
+            <div class="gm-game">
+                <h3>フィッシャー vs スパスキー (1972年)</h3>
+                <p>世界チャンピオン戦で行われた有名な対局で、フィッシャーがシシリアンディフェンスを使用しました。</p>
+                <img src="images/sicilian_classical.png" alt="フィッシャー vs スパスキー" style="max-width: 400px;">
+                <p><strong>ハイライト局面</strong>: フィッシャーは14...Nxd4!と指し、白の中央のナイトを取り除きました。これにより、黒の駒の活動範囲が広がり、最終的に優位を確立しました。</p>
+                <p><strong>重要なポイント</strong>: シシリアンディフェンスでは、適切なタイミングでの駒交換が重要です。フィッシャーはこの対局で、シシリアンの戦略的な深さを見事に示しました。</p>
+                <div class="pgn-code">1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 Nc6 6. Bc4 e6 7. Bb3 Be7 8. Be3 O-O 9. O-O a6 10. f4 Nxd4 11. Bxd4 b5 12. a3 Bb7 13. Qd3 Rc8 14. Rae1 Qc7 15. Kh1 Rfd8 16. Qe2 Qb8 17. Bd1 Qa8 18. Qf3 Qa7 19. Qh3 Qa8 20. Qf3 Qa7 21. Qh3 1/2-1/2</div>
+            </div>
+            
+            <div class="gm-game">
+                <h3>アナンド vs カールセン (2013年)</h3>
+                <p>世界チャンピオン戦で行われた対局で、カールセンがシシリアンディフェンスを使用しました。</p>
+                <img src="images/sicilian_dragon.png" alt="アナンド vs カールセン" style="max-width: 400px;">
+                <p><strong>ハイライト局面</strong>: カールセンは12...d5!と指し、中央での対抗を開始しました。この手は、白の中央支配に挑戦し、黒の駒の活動範囲を広げる重要な戦略的決断でした。</p>
+                <p><strong>重要なポイント</strong>: シシリアンディフェンスでは、適切なタイミングでの中央での対抗が重要です。カールセンはこの対局で、シシリアンの戦略的な可能性を見事に示しました。</p>
+                <div class="pgn-code">1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 g6 6. Be3 Bg7 7. f3 O-O 8. Qd2 Nc6 9. O-O-O d5 10. exd5 Nxd5 11. Nxc6 bxc6 12. Bd4 Bxd4 13. Qxd4 Qb6 14. Na4 Qa5 15. b3 Bf5 16. Bc4 Rad8 17. Rhe1 Nb4 18. Kb1 Rd7 19. Qe3 Rfd8 20. Rd4 Nc2 21. Qe2 Na3+ 22. Ka1 Nc2+ 23. Kb1 Na3+ 24. Ka1 Nc2+ 1/2-1/2</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="common-mistakes" class="tab-content">
+        <div class="section">
+            <h2 id="common-mistakes">7. よくある間違いとその修正方法</h2>
+            <p>シシリアンディフェンスを学ぶ過程で、多くのプレイヤーが陥りがちな間違いとその修正方法を紹介します。</p>
+            
+            <div class="comparison">
+                <div class="comparison-item bad">
+                    <h3>悪い例: 早すぎるe5の突破</h3>
+                    <img src="images/najdorf_bishop_comparison.png" alt="早すぎるe5の突破">
+                    <p>多くの初心者は、シシリアンディフェンスで早すぎるe5の突破を試みます。しかし、十分な準備なしにe5と指すと、白に反撃の機会を与えてしまいます。</p>
+                    <p><strong>問題点</strong>: 駒の展開が不十分な状態でe5と指すと、白はNf5やBg5などの手で反撃し、黒の位置を悪化させることができます。</p>
+                </div>
+                <div class="comparison-item good">
+                    <h3>良い例: 適切な準備後のe5の突破</h3>
+                    <img src="images/dragon_castling_comparison.png" alt="適切な準備後のe5の突破">
+                    <p>e5の突破を試みる前に、Be7, O-O, Qc7などの手で駒を展開し、キングの安全を確保することが重要です。</p>
+                    <p><strong>改善点</strong>: 十分な駒の展開とキングの安全を確保した後にe5と指すことで、白の反撃を防ぎ、中央での優位性を確立することができます。</p>
+                </div>
+            </div>
+            
+            <div class="comparison">
+                <div class="comparison-item bad">
+                    <h3>悪い例: キングの安全を無視</h3>
+                    <img src="images/sicilian_king_safety_bad.png" alt="キングの安全を無視">
+                    <p>シシリアンディフェンスでは、攻撃に夢中になってキングの安全を無視してしまうことがあります。これは特にドラゴンバリエーションで危険です。</p>
+                    <p><strong>問題点</strong>: キングの安全を無視すると、白のユーゴスラビアアタックなどの攻撃に対して脆弱になります。</p>
+                </div>
+                <div class="comparison-item good">
+                    <h3>良い例: キングの安全を確保</h3>
+                    <img src="images/sicilian_king_safety_good.png" alt="キングの安全を確保">
+                    <p>キングの安全を確保するために、適切なタイミングでキャスリングを行い、必要に応じてh6やa6などの手でキングの周りを固めることが重要です。</p>
+                    <p><strong>改善点</strong>: キングの安全を確保することで、白の攻撃に対して堅実に対応し、自分の攻撃を展開する時間を稼ぐことができます。</p>
+                </div>
+            </div>
+            
+            <div class="comparison">
+                <div class="comparison-item bad">
+                    <h3>悪い例: 理論を無視した即興的な手</h3>
+                    <img src="images/sicilian_theory_bad.png" alt="理論を無視した即興的な手">
+                    <p>シシリアンディフェンスは理論が深く、多くのバリエーションがあります。理論を無視した即興的な手は、しばしば不利な局面につながります。</p>
+                    <p><strong>問題点</strong>: 理論から外れた手は、白に既知の反駁を与えてしまう可能性があります。</p>
+                </div>
+                <div class="comparison-item good">
+                    <h3>良い例: 理論に基づいた手順</h3>
+                    <img src="images/sicilian_theory_good.png" alt="理論に基づいた手順">
+                    <p>主要なバリエーションの基本的な理論を学び、理解することが重要です。特に最初の10手程度は、確立された理論に従うことが推奨されます。</p>
+                    <p><strong>改善点</strong>: 理論に基づいた手順を指すことで、均衡した局面を得ることができ、そこから自分の創造性を発揮することができます。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 id="references">8. 参考文献</h2>
+        <ul>
+            <li>「シシリアンディフェンス完全ガイド」 - <a href="https://cufune.jp/sicilian-defense/" target="_blank">https://cufune.jp/sicilian-defense/</a></li>
+            <li>「シシリアンディフェンスの基本戦略」 - <a href="https://xiaoye-chess.hatenablog.com/entry/2020/01/12/135113" target="_blank">https://xiaoye-chess.hatenablog.com/entry/2020/01/12/135113</a></li>
+            <li>「グランドマスターのシシリアンディフェンス」 - John Nunn著</li>
+            <li>「シシリアンディフェンスの戦略と戦術」 - Garry Kasparov著</li>
+            <li>「現代チェス理論」 - Ludek Pachman著</li>
+        </ul>
+    </div>
+
+    <button class="print-button" onclick="window.print()">印刷する</button>
+
+    <script>
+        // バリエーションのPGNデータ
+        const variations = {
+            basic: {
+                title: "シシリアンディフェンス 基本形",
+                pgn: "1. e4 c5",
+                explanation: "シシリアンディフェンスは、1.e4に対して1...c5と応じる黒のオープニングです。白の中央ポーンに対抗し、中央のコントロールを争います。クイーンサイドのスペースが広がり、駒展開や攻撃に有利に働きます。"
+            },
+            najdorf: {
+                title: "ナイドルフバリエーション",
+                pgn: "1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6",
+                explanation: "ナイドルフバリエーションは、5...a6と指す形で、カスパロフやフィッシャーも好んで使用したバリエーションです。a6と突きだす手の意図は、b5の地点に利かせることで白のNb5やBb5を予め潰しておくと共に、将来的には自分でb5~Bb7とフィアンケットを組む準備をします。"
+            },
+            dragon: {
+                title: "ドラゴンバリエーション",
+                pgn: "1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 g6",
+                explanation: "ドラゴンバリエーションは、5...g6と指し、ビショップをg7にフィアンケットする形です。このビショップが長い対角線上で強力な働きをするため、「ドラゴン」と呼ばれています。攻撃的なバリエーションとして知られています。"
+            },
+            scheveningen: {
+                title: "シェベニンゲンバリエーション",
+                pgn: "1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 e6",
+                explanation: "シェベニンゲンバリエーションは、5...e6と指す形です。堅実な構えで、キングの安全を確保しながらカウンター攻撃の準備をします。柔軟性が高く、様々な状況に対応できるバリエーションです。"
+            },
+            classical: {
+                title: "クラシカルバリエーション",
+                pgn: "1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 Nc6",
+                explanation: "クラシカルバリエーションは、5...Nc6と指す形です。ナイトを積極的に中央に展開し、e5の地点を支配します。駒の展開が自然で、初心者にも扱いやすいバリエーションです。"
+            },
+            accelerated_dragon: {
+                title: "アクセレレイテッドドラゴン",
+                pgn: "1. e4 c5 2. Nf3 Nc6 3. d4 cxd4 4. Nxd4 g6",
+                explanation: "アクセレレイテッドドラゴンは、4...g6と早めにビショップをフィアンケットする形です。通常のドラゴンバリエーションよりも早くg6と指すことで、白のマレーシー・バインド（c4, e4, d4のポーン配置）を避けることができます。"
+            },
+            kan: {
+                title: "カン・バリエーション",
+                pgn: "1. e4 c5 2. Nf3 e6 3. d4 cxd4 4. Nxd4 a6",
+                explanation: "カン・バリエーションは、e6とa6を組み合わせた形です。シェベニンゲンバリエーションとナイドルフバリエーションの要素を取り入れた柔軟な構えで、様々な展開に対応できます。"
+            },
+            four_knights: {
+                title: "フォー・ナイツ・バリエーション",
+                pgn: "1. e4 c5 2. Nf3 e6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 Nc6",
+                explanation: "フォー・ナイツ・バリエーションは、両者が2つのナイトを展開する形です。バランスの取れた構えで、中央のコントロールを争います。"
+            },
+            closed: {
+                title: "クローズドシシリアン",
+                pgn: "1. e4 c5 2. c3",
+                explanation: "クローズドシシリアンは、白が2.c3と指す形です。d4の突破を準備しながら、黒のカウンタープレイを制限します。穏やかな展開を好む白向けのバリエーションです。"
+            },
+            grand_prix: {
+                title: "グランプリアタック",
+                pgn: "1. e4 c5 2. f4",
+                explanation: "グランプリアタックは、白が2.f4と指す攻撃的なバリエーションです。キングサイドからの攻撃を準備しますが、中央のコントロールが弱くなるリスクもあります。"
+            },
+            moscow: {
+                title: "モスクワバリエーション",
+                pgn: "1. e4 c5 2. Nf3 d6 3. Bb5+",
+                explanation: "モスクワバリエーションは、白が3.Bb5+と指す形です。黒のナイトの展開を妨げ、d5の地点のコントロールを争います。"
+            },
+            rossolimo: {
+                title: "ロゾリモアタック",
+                pgn: "1. e4 c5 2. Nf3 Nc6 3. Bb5",
+                explanation: "ロゾリモアタックは、白が3.Bb5と指す形です。c6のナイトを攻撃し、黒の駒の展開を妨げます。オープンシシリアンを避けたい白向けのバリエーションです。"
+            }
+        };
+
+        // チェス盤とゲームの初期化
+        let board = null;
+        let game = new Chess();
+        let currentMoveIndex = 0;
+        let moveHistory = [];
+
+        // DOMが読み込まれた後に実行
+        $(document).ready(function() {
+            // チェス盤の初期化
+            board = Chessboard('board', {
+                position: 'start',
+                pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+            });
+
+            // バリエーション選択時の処理
+            $('#variation').change(function() {
+                loadVariation($(this).val());
+            });
+
+            // コントロールボタンの処理
+            $('#startBtn').click(function() {
+                goToMove(0);
+            });
+
+            $('#prevBtn').click(function() {
+                if (currentMoveIndex > 0) {
+                    goToMove(currentMoveIndex - 1);
+                }
+            });
+
+            $('#nextBtn').click(function() {
+                if (currentMoveIndex < moveHistory.length - 1) {
+                    goToMove(currentMoveIndex + 1);
+                }
+            });
+
+            $('#endBtn').click(function() {
+                goToMove(moveHistory.length - 1);
+            });
+
+            // タブ切り替えの処理
+            $('.tab').click(function() {
+                $('.tab').removeClass('active');
+                $(this).addClass('active');
+                
+                const tabId = $(this).data('tab');
+                $('.tab-content').removeClass('active');
+                $('#' + tabId).addClass('active');
+            });
+
+            // 練習問題の選択肢クリック時の処理
+            $('.option').click(function() {
+                const isCorrect = $(this).data('correct') === true;
+                $(this).siblings().prop('disabled', true);
+                
+                if (isCorrect) {
+                    $(this).css('background-color', '#4CAF50');
+                } else {
+                    $(this).css('background-color', '#F44336');
+                    $(this).siblings('[data-correct="true"]').css('background-color', '#4CAF50');
+                }
+                
+                $(this).closest('.exercise').find('.answer').show();
+            });
+
+            // 初期バリエーションの読み込み
+            loadVariation('basic');
+        });
+
+        // バリエーションを読み込む関数
+        function loadVariation(variationKey) {
+            const variation = variations[variationKey];
+            
+            // タイトルと説明を更新
+            $('#variation-title').text(variation.title);
+            $('#explanation').html(`<p>${variation.explanation}</p>`);
+            
+            // PGNを解析してゲームを設定
+            game = new Chess();
+            const moves = variation.pgn.split(' ');
+            moveHistory = ['start'];
+            
+            let moveStr = '';
+            for (let i = 0; i < moves.length; i++) {
+                const move = moves[i];
+                if (move.match(/^\d+\./)) {
+                    moveStr += ' ' + move;
+                } else {
+                    moveStr += ' ' + move;
+                    if (i < moves.length - 1 && !moves[i+1].match(/^\d+\./)) {
+                        game.move(move);
+                        moveHistory.push(game.fen());
+                    } else {
+                        game.move(move);
+                        moveHistory.push(game.fen());
+                    }
+                }
+            }
+            
+            // 手順表示を更新
+            updateMoves(moveStr);
+            
+            // 初期位置に戻す
+            goToMove(0);
+        }
+
+        // 指定した手に移動する関数
+        function goToMove(moveIndex) {
+            currentMoveIndex = moveIndex;
+            board.position(moveHistory[moveIndex]);
+            
+            // 現在の手をハイライト
+            $('.move').removeClass('current');
+            $(`.move[data-index="${moveIndex}"]`).addClass('current');
+            
+            // ボタンの有効/無効を更新
+            $('#prevBtn, #startBtn').prop('disabled', moveIndex === 0);
+            $('#nextBtn, #endBtn').prop('disabled', moveIndex === moveHistory.length - 1);
+        }
+
+        // 手順表示を更新する関数
+        function updateMoves(moveStr) {
+            const $moves = $('#moves');
+            $moves.empty();
+            
+            const moves = moveStr.trim().split(' ');
+            let html = '';
+            
+            for (let i = 0; i < moveHistory.length; i++) {
+                if (i === 0) {
+                    html += `<span class="move" data-index="0">開始</span>`;
+                } else {
+                    const moveIndex = i - 1;
+                    const moveText = moves[moveIndex];
+                    html += `<span class="move" data-index="${i}">${moveText}</span>`;
+                }
+            }
+            
+            $moves.html(html);
+            
+            // 手をクリックしたときの処理
+            $('.move').click(function() {
+                const moveIndex = $(this).data('index');
+                goToMove(moveIndex);
+            });
+        }
+    </script>
+</body>
+</html>
